@@ -28,14 +28,14 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             this.Heading_Text = new System.Windows.Forms.TextBox();
             this.Main_screen = new System.Windows.Forms.DataGridView();
             this.Items_view_btn = new System.Windows.Forms.Button();
             this.Specs_view_btn = new System.Windows.Forms.Button();
             this.Cart_empty_btn = new System.Windows.Forms.Button();
             this.Cart_view_btn = new System.Windows.Forms.Button();
-            this.Qty_to_add = new System.Windows.Forms.TextBox();
             this.Qty = new System.Windows.Forms.Label();
             this.Cart_total_lbl = new System.Windows.Forms.Label();
             this.CartTotal = new System.Windows.Forms.TextBox();
@@ -53,7 +53,10 @@
             this.Qty_1item = new System.Windows.Forms.TextBox();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.messageBox = new System.Windows.Forms.TextBox();
+            this.Qty_to_add_or_remove = new System.Windows.Forms.NumericUpDown();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.Main_screen)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Qty_to_add_or_remove)).BeginInit();
             this.SuspendLayout();
             // 
             // Heading_Text
@@ -76,14 +79,14 @@
             // 
             this.Main_screen.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.Main_screen.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.TopCenter;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.Main_screen.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.TopCenter;
+            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.Main_screen.DefaultCellStyle = dataGridViewCellStyle4;
             this.Main_screen.Location = new System.Drawing.Point(310, 92);
             this.Main_screen.Name = "Main_screen";
             this.Main_screen.Size = new System.Drawing.Size(463, 241);
@@ -137,23 +140,15 @@
             this.Cart_view_btn.UseVisualStyleBackColor = false;
             this.Cart_view_btn.Click += new System.EventHandler(this.Cart_view_btn_Click);
             // 
-            // Qty_to_add
-            // 
-            this.Qty_to_add.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Qty_to_add.Location = new System.Drawing.Point(222, 92);
-            this.Qty_to_add.Name = "Qty_to_add";
-            this.Qty_to_add.Size = new System.Drawing.Size(69, 24);
-            this.Qty_to_add.TabIndex = 9;
-            // 
             // Qty
             // 
             this.Qty.AutoSize = true;
             this.Qty.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Qty.Location = new System.Drawing.Point(125, 95);
+            this.Qty.Location = new System.Drawing.Point(64, 95);
             this.Qty.Name = "Qty";
-            this.Qty.Size = new System.Drawing.Size(91, 18);
+            this.Qty.Size = new System.Drawing.Size(152, 18);
             this.Qty.TabIndex = 10;
-            this.Qty.Text = "Qty to add:";
+            this.Qty.Text = "Qty to add/remove:";
             // 
             // Cart_total_lbl
             // 
@@ -255,6 +250,7 @@
             this.Item_removefromcart.TabIndex = 22;
             this.Item_removefromcart.Text = "Remove from Cart";
             this.Item_removefromcart.UseVisualStyleBackColor = false;
+            this.Item_removefromcart.Click += new System.EventHandler(this.Item_removefromcart_Click);
             // 
             // Discount_label
             // 
@@ -329,6 +325,30 @@
             this.messageBox.TabIndex = 30;
             this.messageBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
+            // Qty_to_add_or_remove
+            // 
+            this.Qty_to_add_or_remove.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Qty_to_add_or_remove.Location = new System.Drawing.Point(222, 93);
+            this.Qty_to_add_or_remove.Maximum = new decimal(new int[] {
+            1000000,
+            0,
+            0,
+            0});
+            this.Qty_to_add_or_remove.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.Qty_to_add_or_remove.Name = "Qty_to_add_or_remove";
+            this.Qty_to_add_or_remove.Size = new System.Drawing.Size(69, 24);
+            this.Qty_to_add_or_remove.TabIndex = 31;
+            this.Qty_to_add_or_remove.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.Qty_to_add_or_remove.ValueChanged += new System.EventHandler(this.Qty_to_add_or_remove_ValueChanged);
+            // 
             // Form1
             // 
             this.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
@@ -337,6 +357,7 @@
             this.BackColor = System.Drawing.Color.Honeydew;
             this.CausesValidation = false;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.Qty_to_add_or_remove);
             this.Controls.Add(this.messageBox);
             this.Controls.Add(this.Qty_1item_lbl);
             this.Controls.Add(this.Qty_1item);
@@ -353,7 +374,6 @@
             this.Controls.Add(this.Cart_total_lbl);
             this.Controls.Add(this.CartTotal);
             this.Controls.Add(this.Qty);
-            this.Controls.Add(this.Qty_to_add);
             this.Controls.Add(this.Cart_empty_btn);
             this.Controls.Add(this.Cart_view_btn);
             this.Controls.Add(this.Specs_view_btn);
@@ -368,6 +388,7 @@
             this.Text = "Grocery Store Simulator";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.Main_screen)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Qty_to_add_or_remove)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -381,7 +402,6 @@
         private System.Windows.Forms.Button Specs_view_btn;
         private System.Windows.Forms.Button Cart_empty_btn;
         private System.Windows.Forms.Button Cart_view_btn;
-        private System.Windows.Forms.TextBox Qty_to_add;
         private System.Windows.Forms.Label Qty;
         private System.Windows.Forms.Label Cart_total_lbl;
         private System.Windows.Forms.TextBox CartTotal;
@@ -399,6 +419,8 @@
         private System.Windows.Forms.TextBox Qty_1item;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.TextBox messageBox;
+        private System.Windows.Forms.NumericUpDown Qty_to_add_or_remove;
+        private System.Windows.Forms.Timer timer1;
     }
 }
 

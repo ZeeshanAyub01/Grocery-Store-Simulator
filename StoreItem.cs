@@ -38,7 +38,6 @@ namespace Grocery_Store_Simulator
         private NpgsqlConnection conn;
         private string sql;
         private NpgsqlCommand cmd;
-        private DataTable dt;
 
         public DataTable Select_All()
         {
@@ -46,7 +45,7 @@ namespace Grocery_Store_Simulator
             DataTable dt = new DataTable();
             try
             {
-                //Writing ou SQL query
+                //Writing our SQL query
                 sql = @"SELECT * FROM StoreItems";
                 cmd = new NpgsqlCommand(sql, conn);
                 dt = new DataTable();
@@ -107,6 +106,34 @@ namespace Grocery_Store_Simulator
             }
 
             return isSuccess;
+        }
+
+
+        public DataTable SelectOneBySKU(int sku, int add_qty)
+        {
+            conn = new NpgsqlConnection(myconnstrng);
+            DataTable dt = new DataTable();
+
+            try
+            {
+                sql = @"SELECT * FROM StoreItems where SKU = @sku";
+                cmd = new NpgsqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@sku", sku);
+                dt = new DataTable();
+                conn.Open();
+                dt.Load(cmd.ExecuteReader());
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+            finally
+            {
+                conn.Close();
+            }
+
+            return dt;
         }
 
     }

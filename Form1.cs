@@ -44,7 +44,7 @@ namespace Grocery_Store_Simulator
 
             //Initializing the quantity of items in the cart to 0
             Qty_1item.Text = 0.ToString();
-            Qty_to_add.Text = 1.ToString();
+            Qty_to_add_or_remove.Value = 1;
 
             //Setting the current row to the first row in the data grid
             this.currentRow = Main_screen.Rows[0];
@@ -102,12 +102,13 @@ namespace Grocery_Store_Simulator
         private void Item_add_btn_Click(object sender, EventArgs e)
         {
             int quantityToAdd = 1;
-            string qty_string = Qty_to_add.Text;
+            //string qty_string = Qty_to_add.Text;
+            quantityToAdd = (int) Qty_to_add_or_remove.Value;
+            //bool result = int.TryParse(qty_string, out quantityToAdd);
+            DataTable dt = items.SelectOneBySKU(int.Parse(this.currentRow.Cells[0].Value.ToString()), quantityToAdd);
 
-            bool result = int.TryParse(qty_string, out quantityToAdd);
-
-
-            if (!result || quantityToAdd < 0)
+            Console.WriteLine(dt.Rows[0]["Description"] + " +> " + dt.Rows[0]["Quantity"]);
+            if (/*!result ||*/ quantityToAdd < 0)
             {
                 MessageBox.Show("Please enter a valid quantity to add!");
             }
@@ -120,7 +121,7 @@ namespace Grocery_Store_Simulator
                     int existingQuantity = int.Parse(existingCartItem["In Cart"].ToString());
                     int newQuantity = existingQuantity + quantityToAdd;
                     existingCartItem["In Cart"] = newQuantity;
-                    updateInterfaceAfterItemAdded(existingCartItem, quantityToAdd);
+                    updateInterfaceAfterItemAddedOrRemoved(existingCartItem, quantityToAdd);
                 }
                 else
                 {           
@@ -140,7 +141,7 @@ namespace Grocery_Store_Simulator
                         this.Cart.Rows.Add(newRow);
                     }
 
-                    updateInterfaceAfterItemAdded(newRow, quantityToAdd);
+                    updateInterfaceAfterItemAddedOrRemoved(newRow, quantityToAdd);
                 }
             }
             else
@@ -192,7 +193,7 @@ namespace Grocery_Store_Simulator
             return null;
         }
 
-        private void updateInterfaceAfterItemAdded(DataRow addedItem, int newlyAdded)
+        private void updateInterfaceAfterItemAddedOrRemoved(DataRow addedItem, int newlyAdded)
         {
             //Update Quantity in cart for the current item
             Qty_1item.Text = addedItem["In Cart"].ToString();
@@ -232,7 +233,7 @@ namespace Grocery_Store_Simulator
                 quantityAdded = Int32.Parse(currentItem["In Cart"].ToString());
 
             Qty_1item.Text = quantityAdded.ToString();
-            Qty_to_add.Text = 1.ToString();
+            Qty_to_add_or_remove.Value = 1;
         }
 
         private float calculateGrandTotal(float cartTotal)
@@ -245,6 +246,38 @@ namespace Grocery_Store_Simulator
             }
 
             return totalWithGST;
+        }
+
+        private void Item_removefromcart_Click(object sender, EventArgs e)
+        {
+            messageBox.Text = "Removing something!";
+            int quantityToRemove = 1;
+            quantityToRemove = (int) Qty_to_add_or_remove.Value;
+
+            if (/*!result ||*/ quantityToRemove < 0)
+            {
+                MessageBox.Show("Please enter a valid quantity to remove!");
+            }
+            else if (this.currentRow.Cells[0].Value != null)
+            {
+                DataRow existingCartItem = fetch_from_cart(int.Parse(this.currentRow.Cells[0].Value.ToString()));
+
+                int existingQuantity = int.Parse(existingCartItem["In Cart"].ToString());
+
+                if (existingQuantity <= 0)
+                {
+                    MessageBox.Show("This item is not present in the cart!");
+                }
+                int newQuantity = existingQuantity + quantityToRemove;
+                existingCartItem["In Cart"] = newQuantity;
+                updateInterfaceAfterItemAddedOrRemoved(existingCartItem, quantityToRemove);
+
+            }
+        }
+
+        private void Qty_to_add_or_remove_ValueChanged(object sender, EventArgs e)
+        {
+
         }
 
         /*private void Categories_SelectedIndexChanged(object sender, EventArgs e)
