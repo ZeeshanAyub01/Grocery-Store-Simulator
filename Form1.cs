@@ -21,7 +21,7 @@ namespace Grocery_Store_Simulator
         private DataTable Cart = new DataTable();
         private DataGridViewRow currentRow;
         private bool discountApplied = false;
-        private float discountRate = 5; //The %age of price deduction to be applied to the grand total
+        private float discountRate = 5; //The percentage of price deduction to be applied to the grand total
         private float taxRate = 13; //GST as a percentage of the cart total, factored into the grand total
 
         private void label2_Click(object sender, EventArgs e)
@@ -101,29 +101,46 @@ namespace Grocery_Store_Simulator
 
         private void Item_add_btn_Click(object sender, EventArgs e)
         {
+            if (this.currentRow.Cells[0].Value == null) //Making sure that SKU for the item to add is not empty
+            {
+                MessageBox.Show("Invalid or no item selected to add!");
+                return;
+            }
+                
             int quantityToAdd = 1;
-            //string qty_string = Qty_to_add.Text;
             quantityToAdd = (int) Qty_to_add_or_remove.Value;
             //bool result = int.TryParse(qty_string, out quantityToAdd);
-            DataTable dt = items.SelectOneBySKU(int.Parse(this.currentRow.Cells[0].Value.ToString()), quantityToAdd);
+            DataTable dt = items.SelectOneBySKU(int.Parse(this.currentRow.Cells[0].Value.ToString()));
+            
+            DataRow addedCartItem = fetch_from_cart(int.Parse(this.currentRow.Cells[0].Value.ToString()));
+            int quantityInStore = (int)dt.Rows[0]["Quantity"];
+            int inCartQuantity = 0;
 
-            Console.WriteLine(dt.Rows[0]["Description"] + " +> " + dt.Rows[0]["Quantity"]);
+
+            if (addedCartItem != null) //checking to see if the item already exists in the cart
+            {
+                inCartQuantity = int.Parse(addedCartItem["In Cart"].ToString());
+            }
+
+            int newQuantity = inCartQuantity + quantityToAdd;
+
             if (/*!result ||*/ quantityToAdd < 0)
             {
                 MessageBox.Show("Please enter a valid quantity to add!");
             }
-            else if (this.currentRow.Cells[0].Value != null)//Making sure that SKU for the item to add is not empty
+            else if ( newQuantity > quantityInStore )
             {
-                DataRow existingCartItem = fetch_from_cart(int.Parse(this.currentRow.Cells[0].Value.ToString()));
-
-                if (existingCartItem != null)
+                MessageBox.Show("Quantity in cart for the item cannot be more than quantity in the store!");
+            }
+            else
+            {
+                
+                if (addedCartItem != null) //If item lready exists in the cart
                 {
-                    int existingQuantity = int.Parse(existingCartItem["In Cart"].ToString());
-                    int newQuantity = existingQuantity + quantityToAdd;
-                    existingCartItem["In Cart"] = newQuantity;
-                    updateInterfaceAfterItemAddedOrRemoved(existingCartItem, quantityToAdd);
+                    addedCartItem["In Cart"] = newQuantity;
+                    
                 }
-                else
+                else //if the item doesn't exist in the cart
                 {           
                     DataRow newRow = this.Cart.NewRow();
                     int i = 0;
@@ -141,12 +158,10 @@ namespace Grocery_Store_Simulator
                         this.Cart.Rows.Add(newRow);
                     }
 
-                    updateInterfaceAfterItemAddedOrRemoved(newRow, quantityToAdd);
+                    addedCartItem = newRow;
                 }
-            }
-            else
-            {
-                MessageBox.Show("Invalid or no item selected to add!");
+
+                updateInterfaceAfterItemAddedOrRemoved(addedCartItem, quantityToAdd);
             }
             
         }
@@ -162,6 +177,7 @@ namespace Grocery_Store_Simulator
         {
             Main_screen.DataSource = null;
             Main_screen.DataSource = this.Cart;
+
             this.currentRow = Main_screen.Rows[0];
             
             if (this.Cart.Rows.Count == 0) //The messageBox is a custom message Box I've added, not the standard C# MessageBox
@@ -195,12 +211,18 @@ namespace Grocery_Store_Simulator
 
         private void updateInterfaceAfterItemAddedOrRemoved(DataRow addedItem, int newlyAdded)
         {
+            //Identify whether the item was added or removed from the cart to generate the correct message
+            string actionPerformed = "added to your cart";
+            
+            if(newlyAdded < 0)
+                actionPerformed = "removed from your cart";
+
             //Update Quantity in cart for the current item
             Qty_1item.Text = addedItem["In Cart"].ToString();
-            
+
             //Display the correct message in the messageBox
             if (addedItem != null)
-                messageBox.Text = newlyAdded.ToString() + " " + addedItem["Description"] + "(s) added to your cart";
+                messageBox.Text = Math.Abs(newlyAdded).ToString() + " " + addedItem["Description"] + "(s) " + actionPerformed + "!";
 
             //Iterate through all the rows in the cart and add prices * quantities in the cart
             float cartTotal = 0;
@@ -224,6 +246,9 @@ namespace Grocery_Store_Simulator
 
         private void updateInterfaceAfterRowChanged()
         {
+            if (this.currentRow.Cells[0].Value == null || this.currentRow.Cells[0].Value.ToString() == "")
+                return;
+
             int current_sku = Int32.Parse(this.currentRow.Cells[0].Value.ToString());
             int quantityAdded = 0;
 
@@ -250,34 +275,57 @@ namespace Grocery_Store_Simulator
 
         private void Item_removefromcart_Click(object sender, EventArgs e)
         {
-            messageBox.Text = "Removing something!";
+
+            if (this.currentRow.Cells[0].Value == null)
+                return;
+
             int quantityToRemove = 1;
             quantityToRemove = (int) Qty_to_add_or_remove.Value;
+            int existingQuantity = 0;
 
-            if (/*!result ||*/ quantityToRemove < 0)
+            DataRow existingCartItem = null;
+
+            if (this.currentRow != null)
+            {
+                existingCartItem = fetch_from_cart(int.Parse(this.currentRow.Cells[0].Value.ToString()));
+            }
+            
+
+            if (existingCartItem != null)
+                existingQuantity = int.Parse(existingCartItem["In Cart"].ToString());
+
+            if ( quantityToRemove < 0 )
             {
                 MessageBox.Show("Please enter a valid quantity to remove!");
             }
             else if (this.currentRow.Cells[0].Value != null)
             {
-                DataRow existingCartItem = fetch_from_cart(int.Parse(this.currentRow.Cells[0].Value.ToString()));
-
-                int existingQuantity = int.Parse(existingCartItem["In Cart"].ToString());
-
                 if (existingQuantity <= 0)
                 {
-                    MessageBox.Show("This item is not present in the cart!");
+                    MessageBox.Show("The selected item does not exist in the cart!");
+                    return;
                 }
-                int newQuantity = existingQuantity + quantityToRemove;
+                int newQuantity = existingQuantity - quantityToRemove;
+                if (newQuantity < 0)
+                {
+                    newQuantity = 0;
+                    quantityToRemove = existingQuantity;
+                }
+                    
                 existingCartItem["In Cart"] = newQuantity;
-                updateInterfaceAfterItemAddedOrRemoved(existingCartItem, quantityToRemove);
+                updateInterfaceAfterItemAddedOrRemoved(existingCartItem, (-1) * quantityToRemove);
+
+                if (newQuantity == 0) //Deleting row after updating interface to let the correct message display
+                    existingCartItem.Delete();
+
 
             }
         }
 
         private void Qty_to_add_or_remove_ValueChanged(object sender, EventArgs e)
         {
-
+            if (Qty_to_add_or_remove.Value < 0) //To make sure that the value in the control is equal to or greater than 0
+                Qty_to_add_or_remove.Value = Math.Abs((int) Qty_to_add_or_remove.Value);
         }
 
         /*private void Categories_SelectedIndexChanged(object sender, EventArgs e)

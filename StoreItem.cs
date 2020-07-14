@@ -109,7 +109,7 @@ namespace Grocery_Store_Simulator
         }
 
 
-        public DataTable SelectOneBySKU(int sku, int add_qty)
+        public DataTable SelectOneBySKU(int sku)
         {
             conn = new NpgsqlConnection(myconnstrng);
             DataTable dt = new DataTable();
@@ -131,6 +131,11 @@ namespace Grocery_Store_Simulator
             finally
             {
                 conn.Close();
+            }
+
+            if(dt.Rows.Count <= 0)
+            {
+                return null;
             }
 
             return dt;
