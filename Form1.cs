@@ -92,6 +92,7 @@ namespace Grocery_Store_Simulator
 
         private void Items_view_btn_Click(object sender, EventArgs e)
         {
+            textBox1.Text = ""; //Clearing the search box
             DataTable dt = items.Select_All();
             Main_screen.DataSource = null;
             Main_screen.DataSource = dt;
@@ -175,6 +176,7 @@ namespace Grocery_Store_Simulator
 
         private void Cart_view_btn_Click(object sender, EventArgs e)
         {
+            textBox1.Text = ""; //Clearing the search box
             Main_screen.DataSource = null;
             Main_screen.DataSource = this.Cart;
 
@@ -188,7 +190,7 @@ namespace Grocery_Store_Simulator
             {
                 messageBox.Text = "Showing all items from your cart";
             }
-            
+
         }
 
         private void Main_screen_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -302,7 +304,7 @@ namespace Grocery_Store_Simulator
             {
                 if (existingQuantity <= 0)
                 {
-                    MessageBox.Show("The selected item does not exist in the cart!");
+                    MessageBox.Show("The selected item (" + "" + ") does not exist in the cart!");
                     return;
                 }
                 int newQuantity = existingQuantity - quantityToRemove;
@@ -326,6 +328,50 @@ namespace Grocery_Store_Simulator
         {
             if (Qty_to_add_or_remove.Value < 0) //To make sure that the value in the control is equal to or greater than 0
                 Qty_to_add_or_remove.Value = Math.Abs((int) Qty_to_add_or_remove.Value);
+        }
+
+        private void textBox1_TextChanged_1(object sender, EventArgs e)//THis is the event handler for the search box
+        {
+            string dataSource = "Store";
+            int resultsFound = 0;
+            int descriptionColumnNum = 2;
+            int i = 0;
+            string descString = textBox1.Text.ToString();
+
+            if (Main_screen.DataSource == this.Cart)
+            {
+                dataSource = "Cart";
+            }
+
+            foreach (DataGridViewColumn col in Main_screen.Columns)
+            {
+                if(col.Name == "Description")
+                {
+                    descriptionColumnNum = i;
+                    break;
+                }
+                i++;
+            }
+
+            messageBox.Text = "searching for " + textBox1.Text + " in the " + dataSource;
+                
+            foreach(DataGridViewRow row in Main_screen.Rows)
+            {
+                string itemDesc = (string) row.Cells[descriptionColumnNum].Value;
+                Console.WriteLine(itemDesc.Contains(descString));
+                //if (itemDesc.ToLower().Contains(descString.ToLower()))
+                //{
+                //    Console.WriteLine(itemDesc);
+                //}
+                //CurrencyManager currencyManager1 = (CurrencyManager)BindingContext[Main_screen.DataSource];
+                //currencyManager1.SuspendBinding();
+                //row.Visible = false;
+                //currencyManager1.ResumeBinding();
+
+
+            }
+
+
         }
 
         /*private void Categories_SelectedIndexChanged(object sender, EventArgs e)
