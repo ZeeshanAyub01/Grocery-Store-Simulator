@@ -40,7 +40,7 @@ namespace Grocery_Store_Simulator
             DataTable dt = items.Select_All();
             Main_screen.DataSource = null;
             Main_screen.DataSource = dt;
-            messageBox.Text = "Showing all items";
+            messageBox.Text = "Showing all items from the store";
 
             //Initializing the quantity of items in the cart to 0
             Qty_1item.Text = 0.ToString();
@@ -96,7 +96,7 @@ namespace Grocery_Store_Simulator
             DataTable dt = items.Select_All();
             Main_screen.DataSource = null;
             Main_screen.DataSource = dt;
-            messageBox.Text = "Showing all items";
+            messageBox.Text = "Showing all items from the store";
             this.currentRow = Main_screen.Rows[0];
         }
 
@@ -304,7 +304,7 @@ namespace Grocery_Store_Simulator
             {
                 if (existingQuantity <= 0)
                 {
-                    MessageBox.Show("The selected item (" + "" + ") does not exist in the cart!");
+                    MessageBox.Show("The selected item, " + this.currentRow.Cells["description"].Value + " does not exist in the cart!");
                     return;
                 }
                 int newQuantity = existingQuantity - quantityToRemove;
@@ -332,46 +332,59 @@ namespace Grocery_Store_Simulator
 
         private void textBox1_TextChanged_1(object sender, EventArgs e)//THis is the event handler for the search box
         {
-            string dataSource = "Store";
+            string dataSourceString = "the store";
             int resultsFound = 0;
-            int descriptionColumnNum = 2;
-            int i = 0;
             string descString = textBox1.Text.ToString();
 
-            if (Main_screen.DataSource == this.Cart)
-            {
-                dataSource = "Cart";
-            }
-
-            foreach (DataGridViewColumn col in Main_screen.Columns)
-            {
-                if(col.Name == "Description")
-                {
-                    descriptionColumnNum = i;
-                    break;
-                }
-                i++;
-            }
-
-            messageBox.Text = "searching for " + textBox1.Text + " in the " + dataSource;
-                
+            /*Setting rows visible or invisible based on whether their descriptios contain the search keyword*/
             foreach(DataGridViewRow row in Main_screen.Rows)
             {
-                string itemDesc = (string) row.Cells[descriptionColumnNum].Value;
-                Console.WriteLine(itemDesc.Contains(descString));
-                //if (itemDesc.ToLower().Contains(descString.ToLower()))
-                //{
-                //    Console.WriteLine(itemDesc);
-                //}
-                //CurrencyManager currencyManager1 = (CurrencyManager)BindingContext[Main_screen.DataSource];
-                //currencyManager1.SuspendBinding();
-                //row.Visible = false;
-                //currencyManager1.ResumeBinding();
+                string itemDesc = (string)row.Cells["description"].Value;
+                bool rowVisbility = true;
 
+                if (itemDesc != null && itemDesc.ToLower().Contains(descString.ToLower()))
+                {
+                    resultsFound++;
+                }
+                else
+                {
+                    rowVisbility = false;
+                }
+
+                if(itemDesc != null)
+                {
+                    CurrencyManager currencymanager1 = (CurrencyManager)BindingContext[Main_screen.DataSource];
+                    currencymanager1.SuspendBinding();
+                    row.Visible = rowVisbility;
+                    currencymanager1.ResumeBinding();
+                }
 
             }
 
+            /*Set a suitable string for the data source to display in the message box later */
+            if (Main_screen.DataSource == this.Cart)
+            {
+                dataSourceString = "your cart";
+            }
 
+            /*Display the appropriate message in the message box about results found*/
+            if (dataSourceString == "your cart" && this.Cart.Rows.Count == 0)
+            {
+                messageBox.Text = "Your cart is currently empty";
+            }
+            else if (descString == "")
+            {
+                messageBox.Text = "Showing all items from " + dataSourceString;
+            }
+            else if(resultsFound == 0)
+            {
+                messageBox.Text = "No matching items found in " + dataSourceString;
+            }
+            else
+            {
+                messageBox.Text = "Showing " + resultsFound + " results from " + dataSourceString;
+            }
+            
         }
 
         /*private void Categories_SelectedIndexChanged(object sender, EventArgs e)
