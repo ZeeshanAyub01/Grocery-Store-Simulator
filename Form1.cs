@@ -330,19 +330,23 @@ namespace Grocery_Store_Simulator
                 Qty_to_add_or_remove.Value = Math.Abs((int) Qty_to_add_or_remove.Value);
         }
 
-        private void textBox1_TextChanged_1(object sender, EventArgs e)//THis is the event handler for the search box
+        //This is the event handler for the search box
+        private void textBox1_TextChanged_1(object sender, EventArgs e)
         {
             string dataSourceString = "the store";
             int resultsFound = 0;
             string descString = textBox1.Text.ToString();
+            int i = 0;
+            DataGridViewRow row = Main_screen.Rows[i]; //We need the row variable seperately to toggle its visibility
+            string itemDesc = (string)row.Cells["description"].Value;
+            
 
             /*Setting rows visible or invisible based on whether their descriptios contain the search keyword*/
-            foreach(DataGridViewRow row in Main_screen.Rows)
+            while (itemDesc != null)
             {
-                string itemDesc = (string)row.Cells["description"].Value;
                 bool rowVisbility = true;
 
-                if (itemDesc != null && itemDesc.ToLower().Contains(descString.ToLower()))
+                if ( itemDesc.ToLower().Contains(descString.ToLower()) )
                 {
                     resultsFound++;
                 }
@@ -351,13 +355,15 @@ namespace Grocery_Store_Simulator
                     rowVisbility = false;
                 }
 
-                if(itemDesc != null)
-                {
-                    CurrencyManager currencymanager1 = (CurrencyManager)BindingContext[Main_screen.DataSource];
-                    currencymanager1.SuspendBinding();
-                    row.Visible = rowVisbility;
-                    currencymanager1.ResumeBinding();
-                }
+                CurrencyManager currencymanager1 = (CurrencyManager)BindingContext[Main_screen.DataSource];
+                currencymanager1.SuspendBinding();
+                row.Visible = rowVisbility; //We toggle row's visibility here after suspending the binding
+                currencymanager1.ResumeBinding();
+
+                /*To move on to the next row in "Main_screen" */
+                i++;
+                row = Main_screen.Rows[i]; 
+                itemDesc = (string)row.Cells["description"].Value;
 
             }
 
@@ -367,7 +373,7 @@ namespace Grocery_Store_Simulator
                 dataSourceString = "your cart";
             }
 
-            /*Display the appropriate message in the message box about results found*/
+            /*Display the appropriate message in the message box about the search results*/
             if (dataSourceString == "your cart" && this.Cart.Rows.Count == 0)
             {
                 messageBox.Text = "Your cart is currently empty";
